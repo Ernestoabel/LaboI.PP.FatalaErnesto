@@ -42,9 +42,11 @@ int buscarEspacioLibreIdArticulos(eArticulo* espacioLibre,int cantidad, int esta
  * @brief -Funcion que se encarga de pedirle al usuario los valores para los campos de la estructura
  *
  * @param id -Entero autoincremental del principal campo de la estructura
+ * @param candidadRubro -Numero de elementos arrays de la estructura eRubro
+ * @param listaRubros -Llamada a la estructura eRubro para ser impresa por consola
  * @return -Retorna una estructura con datos cargados por el usuario
  */
-eArticulo cargaArticulo(int* id);
+eArticulo cargaArticulo(int* id,int candidadRubro,eRubro* listaRubros);
 /**
  * @brief -Funcion que se encarga de condicionar, el ingreso del valor de rubroId, a la posicion de la descripcion
  * en el la estructura eRubro, para que queden relacionada con la estructura eArticulo, esta funcion se utiliza
@@ -153,9 +155,11 @@ int ordenarPorId(eArticulo* listaArticulos,int cantidadArticulos);
  * @param listaArticulos -LLamada a la estructura eArticulos para ser cargada
  * @param cantidadArticulos -Numero de elementos arrays de la estructura eArticulos
  * @param rubros -LLamada a la estructura eRubros para imprimir su campo descripcion
+ * @param cantidadRubro -Numero de elementos arrays de la estructura eRubro
+ * @param idArticulo -Parametro que recive por direccion de memoria el valor idArticulo
  * @return -Un entero para validar si la funcion pudo realizar su cometido
  */
-int funcionAltaArticulo(eArticulo* listaArticulos,int cantidadArticulos,eRubro* rubros);
+int funcionAltaArticulo(eArticulo* listaArticulos,int cantidadArticulos,eRubro* rubros,int cantidadRubro,int* idArticulo);
 /**
  * @brief -Funcion que se encarga de la llamada a funciones, para ser ordenada de menor a mayor por el numero
  * de id, y luego se imprime en pantalla como indice, para que el usuario ingrese el id, que luego eligira entre

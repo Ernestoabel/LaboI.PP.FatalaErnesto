@@ -62,17 +62,22 @@ int calcularPrecioTotal(int* cantidadDeVentas,eArticulo* precio,int cantidadArti
 	}
 	return retorno;
 }
-eVenta realizarFactura(int* id,eArticulo* listaArticulos,int cantidadArticulos,int* posicionArticulo)
+eVenta realizarFactura(int* id,eArticulo* listaArticulos,int cantidadArticulos,int* posicionArticulo,eRubro* listaRubros)
 {
 	eVenta cargaFactura;
-	int validarId=-1;
+	int validarId=-1,i;
 	if(id != NULL){
 		do{
+			mostrarArticulos(listaArticulos,cantidadArticulos,listaRubros);
 			utn_getEntero(&cargaFactura.articuloId,"\nINGRESE EL ID DEL ARTICULO A VENDER\n","--ERROR--",100,200);
 			validarId=validarIdExistente(listaArticulos,cantidadArticulos,&cargaFactura.articuloId,*&posicionArticulo,"\nEL NUMERO DE ID NO CORRESPONDE A UN ARTICULO CARGADO\n");
 		}while(validarId!=0);
-		utn_getEntero(&cargaFactura.cantidad,"\nINGRESE LA CANTIDAD DEL ARTICULO A VENDER\n","--ERROR--",1,100);
+		utn_getEntero(&cargaFactura.cantidad,"\nINGRESE LA CANTIDAD DEL ARTICULO A VENDER\n(MAXIMO 100 UNIDADES POR FACTURA)\n","--ERROR--",1,100);
 		calcularPrecioTotal(&cargaFactura.cantidad,listaArticulos,cantidadArticulos,&cargaFactura.precioTotal,*&posicionArticulo);
+		for(i=0;i<cantidadArticulos;i++){
+			cargaFactura.articuloRubro=(*(listaArticulos+*posicionArticulo)).rubroId;
+			break;
+		}
 		do{
 			utn_getEntero(&cargaFactura.fecha.dia,"\nINGRESE EL DIA EN QUE SE EMITIO LA FACTURA\n","--ERROR--",1,31);
 			utn_getEntero(&cargaFactura.fecha.mes,"\nINGRESE EL MES EN QUE SE EMITIO LA FACTURA\n","--ERROR--",1,12);
@@ -87,29 +92,29 @@ int mostrarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaArticul
 {
     int retorno=-1,i,posicionArticulo;
     if(listaVentas!=NULL){
-    	printf("+---------+------------+---------+----------------+----------+\n");
-    	printf("|%9s|%12s|%9s|%16s|%10s|\n"," ID VENTA"," PRODUCTO"," CANTIDAD"," PRECIO FINAL"," FECHA");
-    	printf("+---------+------------+---------+----------------+----------+\n");
+    	printf("+---------+--------------------+---------+----------------+----------+\n");
+    	printf("|%9s|%20s|%9s|%16s|%10s|\n"," ID VENTA"," PRODUCTO"," CANTIDAD"," PRECIO FINAL"," FECHA");
+    	printf("+---------+--------------------+---------+----------------+----------+\n");
     	for(i=0;i<cantidadVentas;i++){
-            if((listaVentas+i)->idVenta>=20000){
-            	validarIdExistente(listaArticulos,cantidadArticulos,&(listaVentas+i)->articuloId,&posicionArticulo,"");
-                printf("|%9d|%12s|%9d|%16.2f|%2d/%2d/%4d|\n",(*(listaVentas+i)).idVenta,(*(listaArticulos+posicionArticulo)).descripcion,
+            if((*(listaVentas+i)).idVenta>=20000){
+            	validarIdExistente(listaArticulos,cantidadArticulos,(&(*(listaVentas+i)).articuloId),&posicionArticulo,"");
+                printf("|%9d|%20s|%9d|%16.2f|%2d/%2d/%4d|\n",(*(listaVentas+i)).idVenta,(*(listaArticulos+posicionArticulo)).descripcion,
                 		(*(listaVentas+i)).cantidad,(*(listaVentas+i)).precioTotal,(*(listaVentas+i)).fecha.dia,
 						(*(listaVentas+i)).fecha.mes,(*(listaVentas+i)).fecha.anio);
             }
         }
-    	printf("+---------+------------+---------+----------------+----------+\n");
+    	printf("+---------+--------------------+---------+----------------+----------+\n");
         retorno=0;
     }
     return retorno;
 }
-int funcionCargarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaArticulos,int cantidadArticulos)
+int funcionCargarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaArticulos,int cantidadArticulos,eRubro* listaRubros,int* idVenta)
 {
-	int retorno=-1,idLibreVentas,idVenta=20000,posicionArticulo,confirmarSalidaAlta;
+	int retorno=-1,idLibreVentas,posicionArticulo,confirmarSalidaAlta;
 	if(listaVentas!=NULL && listaArticulos!=NULL){
 		do{
 			idLibreVentas=buscarEspacioLibreIdVentas(listaVentas,cantidadVentas,0);
-			*(listaVentas+idLibreVentas)=realizarFactura(&idVenta,listaArticulos,cantidadArticulos,&posicionArticulo);
+			(*(listaVentas+idLibreVentas))=realizarFactura(*&idVenta,listaArticulos,cantidadArticulos,&posicionArticulo,listaRubros);
 			mostrarVentas(listaVentas,cantidadVentas,listaArticulos,cantidadArticulos);
 			confirmarSalidaAlta=continuarCarga("\n¿DESEA REALIZAR OTRA FACTURA?");
 		}while(confirmarSalidaAlta!='N');
@@ -121,8 +126,13 @@ int funcionListarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaA
 {
 	int retorno=-1;
 	if(listaVentas!=NULL && listaArticulos!=NULL){
+		if((*(listaVentas)).idVenta>=20000){
 		mostrarVentas(listaVentas,cantidadVentas,listaArticulos,cantidadArticulos);
 		utn_pausaPrograma();
+		}else{
+			printf("\nNO SE REALIZARON VENTAS\n");
+			utn_pausaPrograma();
+		}
 		retorno=0;
 	}
 	return retorno;

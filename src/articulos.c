@@ -13,7 +13,6 @@ int inicializarArticulos(eArticulo* listaArticulos,int cantidad,int estado)
 		}
 		retorno = 0;
 	}
-
 	return retorno;
 }
 int validarQueHayaArticulos(eArticulo* listaArticulos,int cantidad,int estado)
@@ -43,20 +42,21 @@ int buscarEspacioLibreIdArticulos(eArticulo* espacioLibre,int cantidad, int esta
     }
     return retorno;
 }
-eArticulo cargaArticulo(int* id)
+eArticulo cargaArticulo(int* id,int cantidadRubro,eRubro* listaRubros)
 {
 	eArticulo cargaArticulo;
 	int validarEsSoloLetra;
-	if(id != NULL){
+	if(id != NULL && listaRubros!=NULL){
 		do{
-		utn_getCadenaCaracteres(30,cargaArticulo.descripcion,"\nINGRESE LA DESCRIPCION DEL ARTICULO\n","--ERROR--");
+		utn_getCadenaCaracteres(21,cargaArticulo.descripcion,"\nINGRESE LA DESCRIPCION DEL ARTICULO\n(MAXIMO 20 CARACTERES)\n","--ERROR--");
 		validarEsSoloLetra=utn_cadenaSoloLetra(cargaArticulo.descripcion);
 		}while(validarEsSoloLetra!=1);
-		utn_getCadenaCaracteres(10,cargaArticulo.medida,"\nINGRESE LAS MEDIDAS DEL ARTICULO\n","--ERROR--");
-		utn_getFlotante(&cargaArticulo.precio,"\nINGRESE EL PRECIO DEL ARTICULO\n","--ERROR--",1,500000);
+		utn_getCadenaCaracteres(12,cargaArticulo.medida,"\nINGRESE LAS MEDIDAS DEL ARTICULO\nEJEMPLO(111x111x11)\n","--ERROR--");
+		utn_getFlotante(&cargaArticulo.precio,"\nINGRESE EL PRECIO DEL ARTICULO\n(VALOR MAXIMO 500.000)\n","--ERROR--",1,500000);
+		mostrarRubros(cantidadRubro,listaRubros);
 		utn_getEntero(&cargaArticulo.rubroId,"\nINGRESE EL ID DEL RUBRO DEL ARTICULO\n","--ERROR--",1001,1004);
-		cargaArticulo.idArticulo = *id;
 		(*id)++;
+		cargaArticulo.idArticulo = *id;
 	}
 	return cargaArticulo;
 }
@@ -85,17 +85,17 @@ int mostrarArticulos(eArticulo* listaArticulos,int cantidad,eRubro* listaRubros)
 {
     int retorno=-1,i,indice;
     if(listaArticulos!=NULL){
-    	printf("\n+---+------------+------------+----------+------------+\n");
-    	printf("|%3s|%12s|%12s|%10s|%12s|\n"," ID"," DESCRIPCION"," MEDIDA"," PRECIO"," RUBRO");
-    	printf("+---+------------+------------+----------+------------+\n");
+    	printf("\n+---+--------------------+------------+----------+------------+\n");
+    	printf("|%3s|%20s|%12s|%10s|%12s|\n"," ID"," DESCRIPCION"," MEDIDA"," PRECIO"," RUBRO");
+    	printf("+---+--------------------+------------+----------+------------+\n");
     	for(i=0;i<cantidad;i++){
             if((*(listaArticulos+i)).idArticulo>=100){
             	posicionSector(listaArticulos,&indice,i);
-                printf("|%3d|%12s|%12s|%10.2f|%12s|\n",(*(listaArticulos+i)).idArticulo,(*(listaArticulos+i)).descripcion,
+                printf("|%3d|%20s|%12s|%10.2f|%12s|\n",(*(listaArticulos+i)).idArticulo,(*(listaArticulos+i)).descripcion,
                 		(*(listaArticulos+i)).medida,(*(listaArticulos+i)).precio,(*(listaRubros+indice)).descripcion);
             }
         }
-    	printf("+---+------------+------------+----------+------------+\n");
+    	printf("+---+--------------------+------------+----------+------------+\n");
         retorno=0;
     }
     return retorno;
@@ -253,13 +253,13 @@ int ordenarPorId(eArticulo* listaArticulos,int cantidadArticulos)
 		}
 	return retorno;
 }
-int funcionAltaArticulo(eArticulo* listaArticulos,int cantidadArticulos,eRubro* rubros)
+int funcionAltaArticulo(eArticulo* listaArticulos,int cantidadArticulos,eRubro* rubros,int cantidadRubro,int* idArticulo)
 {
-	int retorno=-1,idArticulo=101,idLibreArticulos,confirmarSalidaAlta;
+	int retorno=-1,idLibreArticulos,confirmarSalidaAlta;
 	if(listaArticulos!=NULL && rubros!=NULL){
 		do{
 			idLibreArticulos=buscarEspacioLibreIdArticulos(listaArticulos,cantidadArticulos,0);
-			*(listaArticulos+idLibreArticulos)=cargaArticulo(&idArticulo);
+			*(listaArticulos+idLibreArticulos)=cargaArticulo(*&idArticulo,cantidadRubro,rubros);
 			ordenarPorId(listaArticulos,cantidadArticulos);
 			mostrarArticulos(listaArticulos,cantidadArticulos,rubros);
 			confirmarSalidaAlta=continuarCarga("\n¿CARGAR EL SIGUIENTE ARTICULO?");
@@ -280,6 +280,7 @@ int funcionModificarArticulo(eArticulo* listaArticulos,int cantidadArticulos,eRu
 					"|1.PARA MODIFICAR MEDIDAS|\n|2.PARA MODIFICAR PRECIO |"
 					"\n+------------------------+\nINGRESE OPCION: ","\n--ERROR--",1,2);
 			modificarArticulo(listaArticulos,&id,eleccionParaModificarArticulo);
+			mostrarArticulos(listaArticulos,cantidadArticulos,rubros);
 			confirmarSalidaAlta=continuarCarga("\n¿MODIFICAR OTRO ARTICULO?");
 		}while(confirmarSalidaAlta!='N');
 
@@ -297,6 +298,7 @@ int funcionBajaArticulo(eArticulo* listaArticulos,int cantidadArticulos,eRubro* 
 				mostrarArticulos(listaArticulos,cantidadArticulos,rubros);
 				ingresarIdParaModificar(listaArticulos,cantidadArticulos,&id);
 				BajaDeArticulo(listaArticulos,&id,0);
+				mostrarArticulos(listaArticulos,cantidadArticulos,rubros);
 			}else{
 				printf("\nNO HAY ARTICULO CARGADOS\n");
 			}

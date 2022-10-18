@@ -10,6 +10,7 @@ typedef struct{
 	int idVenta;
 	int articuloId;
 	int cantidad;
+	int articuloRubro;
 	float precioTotal;
 	eFecha fecha;
 }eVenta;
@@ -32,7 +33,7 @@ int inicializarVentas(eVenta* listaVentas,int cantidad,int estado);
  */
 int buscarEspacioLibreIdVentas(eVenta* espacioLibre,int cantidad, int estado);
 /**
- * @brief -Funcion que recorre un array en busca de validar un id, recivido por parametro, con un
+ * @brief -Funcion que recorre un array en busca de validar un id, que recibe por parametro, con un
  * idArticulo existente en otra extructura, y que ademas guarda su posicion en un puntero entero
  *
  * @param listaArticulos -Estructura eArticulo a ser analizada por la funcion
@@ -67,9 +68,10 @@ int calcularPrecioTotal(int* cantidadDeVentas,eArticulo* precio,int cantidadArti
  * @param listaArticulos -Llamada a la funcion eArticulo para las validaciones
  * @param cantidadArticulos -Numero de elementos arrays de la estructura eArticulo
  * @param posicionArticulo -Direccion de memoria de la posicion en el arrays de eArticulo para la validacion de carga de datos
+ * @param listaRubros -Llamada a estructura eRubro para ser impresa por consola
  * @return -Una estructura eVenta con sus campos llenos de datos ingresados por el usuario
  */
-eVenta realizarFactura(int* id,eArticulo* listaArticulos,int cantidadArticulos,int* posicionArticulo);
+eVenta realizarFactura(int* id,eArticulo* listaArticulos,int cantidadArticulos,int* posicionArticulo,eRubro* listaRubros);
 /**
  * @brief -Funcion que imprime por consola los datos de cada array de campos en la estructura eVentas, junto
  * a la validacion del articuloId conectar con el campo descripcion de la estructura eArticulo
@@ -91,9 +93,11 @@ int mostrarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaArticul
  * @param cantidadVentas -Numero de elementos arrays de la estructura eVenta
  * @param listaArticulos -Llamada a la funcion eArticulo para la impresion de su campo descripcion
  * @param cantidadArticulos -Numero de elementos arrays de la estructura eArticulo
+ * @param listaRubros -Llamada a estructura eRubro para ser impresa por consola
+ * @param idArticulo -Parametro que recive por direccion de memoria el valor idVenta
  * @return -Un entero para validar si la funcion pudo realizar su cometido
  */
-int funcionCargarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaArticulos,int cantidadArticulos);
+int funcionCargarVentas(eVenta* listaVentas,int cantidadVentas,eArticulo* listaArticulos,int cantidadArticulos,eRubro* listaRubros,int* idVenta);
 /**
  * @brief -Funcion que se encarga de llamar a la funcion listar las ventas realizadas
  *
